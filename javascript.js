@@ -1,15 +1,27 @@
-function randomComputerChoice() {
-    let random = Math.floor(Math.random() * 3);
-    if(random == 0) return "rock";
-    else if(random == 1) return "paper";
-    else return "scissors";
+let pc = 0;
+let user = 0;
+
+const score = document.querySelector('.score');
+const info = document.querySelector('.info');
+
+score.textContent = `Computer(${pc}) - User(${user})`;
+info.textContent = 'Press Rock, Paper or Scissors';
+
+function initiatePlay(e){
+    let userChoice = e.target.dataset.key;
+    let computerChoice = randomComputerChoice();
+    playRound(userChoice, computerChoice);
+    
 }
+let buttons = document.querySelector('.buttons');
+
+buttons.childNodes.forEach(button => button.addEventListener('click', initiatePlay));
 
 function playRound(playerSelection, computerSelection) {
     let state = null;
     switch(true) {
 
-        case playerSelection == computerSelection: return "It's a tie";
+        case playerSelection == computerSelection: break;
         case playerSelection == "rock" && computerSelection == "scissors":
         case playerSelection == "scissors" && computerSelection == "paper":
         case playerSelection == "paper" && computerSelection == "rock": state = "Win"; break;
@@ -18,32 +30,45 @@ function playRound(playerSelection, computerSelection) {
         case computerSelection == "paper" && playerSelection == "rock": state = "Lose";
 
     }
-    if(!state) return null;
-    else if(state == "Lose") return `You ${state}! ${computerSelection} beats ${playerSelection}`;
-    else return `You ${state}! ${playerSelection} beats ${computerSelection}`;
+    if(!state) info.textContent = "Its a tie";
+    else if(state == "Lose") {
+        info.textContent = `You ${state}! ${computerSelection} beats ${playerSelection}`;
+        pc++;
+    }
+    else {
+        info.textContent = `You ${state}! ${playerSelection} beats ${computerSelection}`;
+        user++;
+    }
+    score.textContent = `Computer(${pc}) - User(${user})`
+    if(pc == 5 || user == 5) stopGame();
     }
 
+function randomComputerChoice() {
+    let random = Math.floor(Math.random() * 3);
+    if(random == 0) return "rock";
+    else if(random == 1) return "paper";
+    else return "scissors";
+}
 
-function game() {
-    let c = 0;
-    let u = 0;
-    while(c != 5 && u != 5){
-        let computerChoice = randomComputerChoice();
-        let userChoice = prompt("Choose").toLowerCase();
-        let msg = playRound(userChoice, computerChoice);
-        while(!msg) {
-            console.log("type choices correctly");
-            userChoice = prompt("Choose").toLowerCase();
-            msg = playRound(userChoice, computerChoice);
-        }
-        console.log(msg);
-        let state = msg.charAt(4); 
-        switch(state){
-            case "L": c++; break;
-            case "W": u++; break;
-        }
-        console.log(`score is user: ${u} vs computer: ${c}`)
+let restart = document.createElement('button');
+restart.textContent = 'Play Again!';
+restart.addEventListener('click', reset);
+
+function stopGame(){
+    if(pc == 5) 
+        info.textContent = 'Computer Won, better luck next time );';
+    else 
+        info.textContent = 'You Won, Way to go (;';
+    
+    buttons.remove();
+    document.querySelector('body').appendChild(restart);
     }
-    if(c == 5) console.log("You Lost the Game");
-    else console.log("You Won the Game, Congratulations");
+
+function reset(){
+    pc = 0;
+    user = 0;
+    score.textContent = `Computer(${pc}) - User(${user})`;
+    info.textContent = 'Press Rock, Paper or Scissors';
+    restart.remove();
+    document.querySelector('body').appendChild(buttons);
 }
